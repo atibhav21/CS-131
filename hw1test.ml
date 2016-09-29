@@ -27,9 +27,13 @@ let computed_fixed_point_test1 = computed_fixed_point (=) (fun x -> x *. 2.) 1. 
 let computed_fixed_point_test2 = computed_fixed_point (=) sqrt 10. = 1.
 let computed_fixed_point_test3 = ((computed_fixed_point (fun x y -> abs_float (x -. y) < 1.) (fun x -> x /. 2.) 10.) = 1.25)
 
-(*
-let computed_periodic_point_test0 = computed_periodic_point (=) (fun x -> x / 2) 0 (-1) = -1
-let computed_periodic_point_test1 = computed_periodic_point (=) (fun x -> x *. x -. 1.) 2 0.5 = -1. *)
+let computed_periodic_point_test0 = computed_periodic_point (=) (fun x -> x / 2) 0 (-1) = -1 
+let computed_periodic_point_test1 = computed_periodic_point (=) (fun x -> x *. x -. 1.) 2 0.5 = -1. 
+
+let my_computed_periodic_point_test0 = computed_periodic_point (=) (fun x -> x/2) 3 (100) = 0
+let my_computed_periodic_point_test1 = computed_periodic_point (=) (fun x -> x/2) 1 (1000000000) = 0
+let my_computed_periodic_point_test2 = computed_periodic_point (=) (fun x-> x*.2.) 1 (1.) = infinity
+let my_computed_periodic_point_test3 = computed_periodic_point (=) sqrt 1 10. = 1.
 
 let while_away_test0 = equal_sets (while_away ((+) 3) ((>) 10) 0) [0; 3; 6; 9]
 

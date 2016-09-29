@@ -78,3 +78,25 @@ Language Design Issues
 	- Orthonoality 
 	- Efficiency (CPU Time, Memory, power, network access)
 	- Simplicity 
+	- Convenience
+	- Safety (Buffer overruns, memory leaks, race conditions)
+	- Readability, mantainability
+	- Write-ability
+	- loose typing (opposes safety)
+	- Portability
+	- Evolution of the language
+
+TEX - formatting language
+Rust - Systems Language (like C) but safer (memory, races)
+Go - Systems Language
+Ceylan - Java meets JS
+F# - Functional Language designed by Microsoft, ML meets C#
+GNU Emacs (C Core)
+	Obj args[7]
+	args[0] = a0,
+	...
+	args[6] = Qnil,
+	Foo(7, args)
+
+
+#define ELTS(a)	(sizeof(a)/sizeof(a[0]))

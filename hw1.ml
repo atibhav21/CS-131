@@ -1,5 +1,10 @@
 (* Homework 1 CS 131 *)
 
+(* Typedef for filter blind alleys *)
+type ('nonterminal, 'terminal) symbol =
+  | N of 'nonterminal
+  | T of 'terminal 
+
 (* returns true if list l contains element e*)
 let rec contains e l =
 	match l with 
@@ -39,28 +44,38 @@ let rec set_diff a b =
 
 (* returns the fixed point of x *)
 (* returns the value*)
-let rec computed_fixed_point eq f x = 
-	let y = f(x) in 
-	if (eq y x) then x
+let rec computed_fixed_point eq f t = 
+	let y = f(t) in 
+	if (eq y t) then t
 		else (computed_fixed_point eq f y)
 	
 (* Not Working *)
-(*
-let rec computed_periodic_point eq p f x =
-	let y = f(x) in
-	if (p = 0) then
-		if (eq y x) then x
-		else (computed_periodic_point eq p f y)
-	else
-		(computed_periodic_point eq (p-1) f y)*)
+
+let rec calculate_p_calls eq f p x currentVal =
+	let y = f(currentVal) in
+	match p with 
+	0 -> if ( eq currentVal x) then true
+		else false
+	| _ -> (calculate_p_calls eq f (p-1) x y)
+
+let rec calculate_pth_call f p x =
+	match p with
+	0 -> x
+	| _ -> (calculate_pth_call f (p-1) (f x))
+
+let rec computed_periodic_point eq f p x =
+	if (p = 0) then x 
+else
+	match (calculate_p_calls eq f p x x) with
+	true -> (calculate_pth_call f p x)
+	| false -> (computed_periodic_point eq f p (f x))
+		
 
 (* returns the longest list such that p x is true, x is updated using s x *)
 let rec while_away s p x =
 		if (p x) then 
 			x::(while_away s p (s x))
 	else []
-
-
 
 (* return list of n e elements*)
 let rec get_list n e =
@@ -78,8 +93,43 @@ let rec rle_decode lp =
 	[] -> []
 	| h::t -> (decode_item h)@(rle_decode t)
 
+(* FILTER BLIND ALLEY RULES CODE*)
 
+(* Might be stuck in infinite recursion between find_possible_replacements and is_terminal *)
+(*
+let rec find_possible_replacements a r =
+	match r with 
+	[] -> true
+	| h::t -> match h with 
+			  (x, y) -> match x with 
+			  			a -> (is_terminal y r)
+			  			| _ -> (find_possible_replacements a t)
+			  | _ -> false
 
+let rec is_terminal y g =
+	match y with
+		[] -> true
+		| h::t -> match h with
+				 T k -> (is_terminal t g)
+				| N l -> (find_possible_replacements l g) && (is_terminal t g)
+
+let is_blind_alley r e =
+	match e with
+	(x,y) -> (is_terminal y r)
+	| _ -> false (* Not a rule *)
+
+let rec filter_rules startingSymbol r = 
+	match r with 
+	[] -> []
+	| h::t -> if (is_blind_alley r h) then (filter_rules t)
+				else h @ (filter_rules t)
+
+let rec filter_blind_alleys g =
+	match g with
+	(x, y) -> x::(filter_rules x y)
+	| _ -> g
+*)
+(* Computed Fixed Point can have replacement to Non-terminal Symbols as a function, *)
 
 
 
