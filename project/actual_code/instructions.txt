@@ -1,0 +1,16 @@
+TO RUN A SERVER:
+
+python server.py <server name>
+
+<server name> could be:
+Alford
+Welsh
+Hamilton
+Ball
+Holiday
+
+TO RUN THE CLIENT:
+
+telnet localhost <port num>
+
+where <port num> for each server is given in the conf.py file

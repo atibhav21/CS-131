@@ -1,0 +1,794 @@
+CS 131 - Section 1
+TA - Tomar Weiss
+Email: tweiss@cs.ucla.edu
+Office Hours: TBA (Monday Morning)
+
+Slides Link: goo.gl/gLraJl
+
+_ - Wildcard (just like swift)
+^ - Concatening Strings
+
+rlwrap ocaml (up arrow for previous command)
+
+;; Enter (To run the command)
+
+(* return sum of elements in list *)
+let rec sum l =
+	match l with 
+	[] -> 0
+	| h::t -> h + (sum t)
+
+(* concatenate elements of a string *)
+let rec concat l =
+	match l with
+	[] -> ""
+	| h::t -> h ^ (concat t)
+
+(* clone 9 5 -> [9;9;9;9;9] *)
+
+let rec clone z n =
+	match n with
+	0 -> []
+	| _ -> z:: (clone z (n-1))
+
+(* every_second [1;2;3;4;5] -> [2:4] *)
+let rec every_second l =
+	match l with
+	[] -> []
+	| [_] -> []
+	| h1::h2::t -> h2::(every_second t)
+
+(* contains 1 [1;2;3] -> true *)
+let rec contains e l =
+	match l with
+	[] -> false
+	| h::t -> if h = e then true
+			  else (contains e t)
+
+let rec delete_element e l =
+	[] -> []
+	| h::t -> if h = e then (delete_element e t)
+			  else h::(delete_element e t)
+
+
+Lecture 
+
+Literate Programming - Code contains comments which can later be converted to a textbook format
+
+hash trie
+
+Code for problem given in class
+
+tr -cs A-Za-z '\n*' | sort | uniq -c | sort -rn 
+
+
+
+Sapir-Wharf Hypothesis
+	- The language we use to some extent determines how we view the work abd how we think
+	- The structural diversity of languages is essentially limitless
+
+
+Lecture - 4 hours/week	3.5 hours/week
+Discussion - 2 hours/week	1.7 hours/week
+Outside Study - 6 hours/week 	10 hours/week
+
+Textbook: Read Chapters 1 - 3 (Anything that says ML 5,7,9)
+
+Language Design Issues
+	- Orthonoality 
+	- Efficiency (CPU Time, Memory, power, network access)
+	- Simplicity 
+	- Convenience
+	- Safety (Buffer overruns, memory leaks, race conditions)
+	- Readability, mantainability
+	- Write-ability
+	- loose typing (opposes safety)
+	- Portability
+	- Evolution of the language
+
+TEX - formatting language
+Rust - Systems Language (like C) but safer (memory, races)
+Go - Systems Language
+Ceylan - Java meets JS
+F# - Functional Language designed by Microsoft, ML meets C#
+GNU Emacs (C Core)
+	Obj args[7]
+	args[0] = a0,
+	...
+	args[6] = Qnil,
+	Foo(7, args)
+
+
+#define ELTS(a)	(sizeof(a)/sizeof(a[0]))
+#define CALLMANY(f, args) ((f)(ELTS(args), args))
+#define CALLN(f,...) CALLMANY (f, ((Obj[]){__VA_ARGS__}))
+
+CALLN(Foo, a0, ..., Qnil); // Got This
+Foo(a0, ... , Qnil); //Goal
+
+Foo(7, ((Obj []) {a0, ... , Qnil}));
+
+Tokens - atom of syntax, composed from characters, which are composed from bytes
+	In C, 
+		comments & white space
+		strings and chars (escapes and quoting)
+
+Grammar
+	Natural Language Grammar theory
+		- type 0 grammars - regular expressions
+		- type 1 grammars - BNF Backus Naur (Normal) Form
+
+BNF: Context free grammars
+	- assume finite set of tokens (* / % -- - ID INT)
+	- a finite set of nonterminal symbols (if we have one, it is an incomplete set of tokens, it stands for a whole bunch of tokens, tokens which we don't know what they are)
+		including one start symbol
+	- finite set of grammar rules (nonterminal -> symbol *)
+
+	eg.
+	nonterminals = {E}
+	terminals = {ID, INT, *, +, (, )}
+
+	rules = {
+		E -> E * E
+		E -> E + E
+		E -> (E)
+		E -> ID
+		E-> INT
+	}
+
+	Derive an expression, start with start symbol,
+	E
+	E + E
+	E + E * E
+	ID + E * E
+	ID + E * INT
+	ID + I D * INT
+
+Internet RFC 5322
+
+- Email Contents 
+	- Series of Bytes
+	- Header 
+		- Subject: <Value>
+		- From: <Value>
+		- Message ID: 
+	- Contents (arbitrary string of text)
+
+A message id is of the form:
+	msg-id = "<" word *("."word)"@"atom *("."atom)">"
+	BNF: nt -> (nt|t)*
+	The *, () symbols are metasymbols. This is called EBNF ( Extended BNF)
+
+In Internet RFC EBNF
+	*(A) =  | A | AA | AAA
+	A/B = A|B
+
+EBNF just makes the grammar easier to read, it doesn't change the essence of the language
+
+
+In BNF, the above msg-id can be written as
+
+	msg-id = "<" word dot_words "@" atom dot_atoms ">"
+	dot_words = (nothing)
+	dot_words = "." word dot_words
+	word = atom/quoted-string
+	atom = 1 * <any CHAR except specials, SPACE, and CTLs>
+	CHAR = ASCII char
+	specials = () <> @ , ;: \ ". []
+	CTLs = '\000' - '\037', '\177'
+	quoted-string = <"> *(qtext/quoted-pair)<" 
+	qtext - <any CHAR except "\CR">
+	quoted pair = "\" CHAR
+
+
+We can use a bash script for the above task using regular expressions
+
+quotedchar = '\.'
+qtext = '[abcd.... ()<>]'
+quoted_string = "\"($qtext|$quoted_pair)*\""
+atom = '[abcd.....(all regular characters)]+'
+word = "($atom|$quoted_string)"
+words = "$word(\.$word)*"
+atoms = "$atom(\.$atom)*"
+pat = "^<$words@$atoms>\$"
+
+grep -E "$pat"
+
+ISO standard for EBNF
+http://www.cl.cam.ac.uk/~mgk25/iso-ebnf.html
+
+"terminal symbol" 'terminal symbol' - same thing
+[option]
+{repetition}
+(grouping)
+(* comment *)
+
+In decreasing precedence,
+
+A*
+A-B = A but not B (exception operator)
+A,B = concatenation
+A|B = OR
+A=B; 	definition (A has to be non-terminal)
+
+ISO EBNF standard is writted in ISO EBNF
+
+syntax = syntax rule, {syntax rule};
+syntax rule = meta id, '=',defns list, ';';
+defns list = defn, {'|',defn};
+defn = term, {',', term};
+term = factor, ['-', exception];
+
+What can go wrong with grammars?
+	- define a nonterminal but never use it (not the starting symbol and no other grammar rule uses it)
+	- use a non-terminal without defining it
+	- applied recursively + mutual recursion that never ends
+	- unnecessary complexity 
+	- dup L.H.S ub sine EBNFs
+	- ambiguity
+
+Problem is putting too much detail in grammar
+
+S -> NP VP
+NP -> N
+VP -> V
+N -> "boys" | "UCLA"
+V -> "jump" | "educates"
+Problem with singular and plural
+
+S -> SNP SVP
+S -> PNP PVP
+SNP -> SN
+SVP -> SV
+PNP -> PN
+PVP -> PV
+SN -> "UCLA"
+PN -> "boys"
+SV -> "educates"
+PV -> "jump"
+Problem with this is that it almost doubles the size of the grammar to deal with just 1 feature
+
+C Language grammar
+stmt: 
+	;
+	expr ;
+	return expr;
+	break;
+	continue;
+	while (expr) stmt
+	do stmt while(expr);
+	
+
+How to characterize programming notations?
+Three way division:
+	- Imperative - about commands (C, C++, Java) <- assignments, loops
+	- Functional - calls (to functions) (Lisp, OCaml, Scheme) <- expressions, recursions
+	- logic - Prolog
+
+Why OCaml is needed?
+
+Example
+Big Backend queries in Google:
+	multiple computers on a network
+	C/C++ <- too hard to get right
+MapReduce (idea stolen from functional programming)
+
+Example
+	Wall Street Trading
+	Wrote code in Imperative language, 
+	used metaprogramming to increase speed
+	Metaprograms have to do a lot of pattern matching and use recursion
+	Writing C code to do this was inefficient, so they switched to OCaml
+
+2 main motivations of functional programming:
+	- Clarity (John Backus = escape from von Neumann's style)
+		no order of evaluation problems
+	- Performance via parallelism 
+
+OCaml
+Basic Properties:
+- Is objected oriented, but we skip that in this class
+- Good support for higher order functions
+- No need to worry about memory management
+- Compile time type checking (like C++, Java)
+- Type inference (don't need to write types all the time)
+
+Lists are homogenous
+Tuples are heterogenous 
+Number of components of a tuple is known as compile time
+
+let car(h::t) = h;;
+WARNING: Empty list will give an error
+
+let carsafe = fun x -> 
+	match x with 
+	| h::t -> h
+	| [] -> [] ;;
+
+carsafe: 'alist list -> 'a list = <fun>
+
+let carsafe = fun (d,x) ->
+	match x with 
+		| h::t-> h
+		| [] -> d
+
+carsafe: 'a * 'a list -> 'a = <fun>
+
+Conventional Languages like C++, Java required functions to have a name
+in OCaml, we can create lamba functions like
+foo x -> x + 1
+
+Higher Order Functions
+C has a standard function called qsort
+void qsort(4 args: array, # elements, size of each element, comparison fn)
+comparison fn would look something like,
+
+(void const*)*(coid const *) -> int
+int(*fn)(void const*, void const*)
+
+main function calls qsort, qsort calls fn
+
+Conventional languages in C, in some sense, have higher order functions
+In functional languages, 
+
+let cons h l = h::l ;;
+let cons= (fun h-> (fun l -> h::l));; (* Parentheses here are implied parentheses *)
+
+let cons3 = cons 3;;
+cons3 [5;7] => [3;5;7]
+
+struct list{int val; struct list* next;};
+typedef struct list (*lfn) (struct list*);
+lfn cons(int h) {
+	return hfn;
+}
+
+static int saveh;
+static struct list* hfn(struct list *next) {
+	//add the value to the list
+}
+
+There is a problem with the above code.
+
+OCaml
+let rec reverse = function
+	| [] -> []
+	| h::t -> (reverse t) @ [h];;
+O(N^2 ) @ takes O(N) type
+
+let reverse = 
+	let rec revapp a = function
+		| [] -> a;
+		| h::t -> revapp (h::a) t
+	in revapp [] 
+
+let rec maxval = function
+	| h::t = let tmax = maxval t
+			 in if h<tmax then tmax else h
+	| [] -> INT_MIN
+
+This will only work with lists of type int
+
+let rec maxval lt ninf = function
+	| h::t = let max = maxval t
+			 in if lt h tmax then tmax else h
+	|  [] = ninf
+
+
+let car h::t = h
+let carsafe = function
+	| h::_ -> h
+	| [] -> None
+
+type 'a option =
+	| Some of 'a
+	| None
+
+C Source Code -> C sans macros -> C tokens -> C parse tree -> attribute parse tree -> intermediate code -> x86-64 .s
+			gcc -E 			tokenizer		parser		  type, name checking						code generator
+
+-> x86-64 ----->  	x86-64 executable ----> load it into ram
+			Linker
+
+The above approach is called the software tools approach. 
+
+Software tools
+Unix (1977)
++ components
++ fast execution
+
+IDE (Integrated Development Environment) model
+
+Smalltalk (1978)
++ better debugging
++ faster turnaround
+
+Compilers
+1. translate from source code to machine code, and then run the machine code
+2. + speed of execution
+
+Interpreters
+1. Minimal/simple translation from source code to an intermediate representation (<- this could be in the form of a tree, or bytecode)
+2. + debugging
+
+Traditional Java
+foo.java ---> foo.class  -----> java runtine
+		javac        bytecode fro JVM
+
+JVM - Java Virtual Machine
+
+The problem with the above approach is that foo.class is made to be portable. If it is created on an x86-64 machine, then ported to an x86 (32 bit) machine, then there might be problems, related to memory allocation
+
+for eg.
+double a,b,c
+double d = a*b + c;
+
+The answer to d should be same on all machines. However the answer differs by 1 bit, due to rounding errors
+It consists of 2 instructions: 
+		add
+		mul
+(2 rounding errors)
+muladd (1 rounding error)
+
+Dynamic Linking
+
+Types:
+a description of the set of possible values held in a variable or object
++ set of operations on the values of the type
+
+Motivation for types:
+- to catch errors
+- readability
+- performance
+
+There is a difference between how these values are described:
+- abstract types
+- exposed types
+
+exposed
+struct complex {double re, im;}
+
+abstract
+struct cplx * new_cplx(double re, double im)
+struct cplx; 
+
+Fastest computer in the world:
+LINPACK - linear programming
+
+Sunway TaihuLight
+40,960 nodes each SW26010 processor -> each contains 4 CPU clusters (network on a chip) -> each contains 64 lightweight computation CPUs
++ 1 general purpose CPU
+10.6 million cores
+
+93 Petaflops/s
+15 MW
+6 Gflops/W
+1.3 PB RAM
+RaiseOS (Linux derivative)
+
+SIMD - Single Instruction Multiple Data
+Addition of two vectors, computed in parallel
+Each core has the same instruction pointer
+MIMD - Multiple Instruction Multiple Data
+Each processor has its own instruction pointer
+
+Sun Microsystems (server + workstations)
+They used Solaris (Unix) which was written in C
+the programs they ran on this was also written in C (difficult for amateur programs to write perfect code, they wrote flaky code)
+shared memory computation (eg. pthreads)
+
+pain to write and debug
+unreliable
+
+They decided to research C++ as a solution to solving this problem, however it had many problems:
+- bad pointers etc.
+- many CPU architectures
+- big executables
+
+Sun Microsystems came up with a language C+-, it made it easier to write and debug but pointers, CPU architectures, big executables
+
+Xerox PARC developed a language called Smalltalk, including IDE. Some of the ideas they came up with were useful to solve Sun Microsystems problems:
+1. bytecodes (intermediate stage)
+2. garbage collector: didn't have to worry about freeing storage
+3. interpreter
+4. object oriented
+
+The Sun engineers copied from Smalltalk but changed some features:
+Combined C++ and Xerox PARC to create a new language called Java. 
+C++ syntax + static type checking
+Smalltalk semantics
+They named this language Oak (=> Java)
+You could run Java code on server-side apps. this is what made Java take off
+Java is making a comeback due to its use in Android
+
+Java - C++ (Differences)
+primitive types
+	byte (8 bits), short (16 bits), int (32 bits), long(64 bits)
+	float double <= IEEE 754
+	(objects)
+
+arrays
+	allocated on the heap
+	dynamically allocated
+	smaller executables
+	bounds checking
+	more orthogonal
+	size is constant, once allocated
+	reference types - implemented by pointers
+	(not objects)
+
+Single inheritance
+	Object Class is the parent class for all objects
+	Abstract classes
+		abstract class Foo extends Bar {
+			public abstract int m();
+		}
+		no objects of abstract classes
+		obligation on child class to implement abstract methods
+
+To look at Java from the back door, we look at the Object Class
+
+public class Object {
+	public Object();
+	public boolean equals(Object obj); //defaults to == (ref comparison)
+	public int hashCode();
+	public String toString();
+	public final Class getClass();
+
+}
+
+protected Object clone() throws CloneNotSupportedException
+
+public class Object {
+	protected void finalize() throws Throwable;
+		// for reflection
+}
+
+Symmetric MultiProcessing (SMP)
+
+main thread can create other threads,
+# of threads that can be used is "unlimited"
+
+If we have 100 threads, 4 CPUs, how do we figure out which thread runs next?
+Its not the main thread's job to figure out which thread runs next
+
+There is a scheduler though which decides which thread to run
+
+Thread is a subclass of Object
+Thread t = new Thread()
+
+resulting state
+New
+	t.start() -> allocates OS resources, invokes the threads run method (t.run())
+
+resulting state:
+	RUNNABLE (may or may not be executing, as it might not have CPU resources)
+
+Within the thread (run method) , we can include:
+	ordinary Java Code: state remains RUNNABLE
+	sleep: TIMEDWAITING
+	wait: WAITING
+	do I/O: BLOCKED
+	return from run(): TERMINATED
+	(sleep, wait and do I/O are not RUNNABLE)
+
+public interface Runnable {
+	prublic void run();
+}
+class MyClass implement Runnable {
+	public void run() {
+		// interesting code here
+	}
+}
+
+The advantage of this is that we can have Classes that are not subclasses of Thread, which gives us more flexibility
+
+T1 will call ->
+o.wait()
+optional timeout:
+	1) remove all locks held by this thread
+	2) wait until o becomes available
+
+T2 will call ->
+o.notify() 
+	1) wake up at most one thread waiting for o (the object is now available)
+	
+o.notifyAll() wakes up all the threads waiting
+
+We would use notifyAll when we want to break the schedule made by the OS's scheduler
+When we use notifyAll, we would have quick synchronized methods designed so that our application will be fast
+
+Exchanger Class 
+	- implements a rendezvous
+
+		v2 = e.exchange(v1);
+
+CountDownLatch
+	trying to arrange a bunch of threads to run at the same time
+	horses example
+
+CyclicBarrier
+	
+Another low level way for multithreading is the following
+just do loads + stores
+problem: accesses to objects are optimized
+
+volatile keyword
+What this does is that when we access a volatile object, the compiler has to access the object, it cannot be optimized or replaced or any other thing
+eg. o.i - o.i <= Machine code will have to do two loads and then do a subtraction
+
+Java Memory Model
+
+A: 	normal load
+	normal store
+B: 	volatile load
+	enter monitor
+C: 	volatile store
+	exit monitor
+
+can re-order table
+			2nd operation
+		A 			B 			C
+	
+	A 	yes		  yes
+1st
+
+
+	B 	
+
+
+
+	C 	yes
+
+(A,A): can be re-ordered if its okay in a single threaded application
+	eg. a = o.i
+		o.i = b <- cannot be re-ordered
+
+		or
+		a = ar[i];
+		ar[j] = b; (cannot be reordered as i = j)
+
+(A,B): can be interchanged (In JMM)
+		a = o.i;
+		b = o.j; <- volatile
+
+(A,C): can not be re-ordered
+
+static string g; 		
+Where this model breaks down:
+	String s1 = "/usr/tmp";
+	String s2 = s1.substring(4);
+
+substring implementation:
+	r = new String();
+	r.base = s1.base;
+	r.offset = 4;
+	g = r;
+	return r;
+
+s2.offset 
+
+Thread 2:
+	print(g.offset) can print 0!!
+
+extra rules for constructors:
+	1) stores into this must not be reordered to after the constructor returns
+	2) constructors cannot store this into global storage 
+
+Types:
+	subtypes of 'int'
+
+Pascal: var i: 1..10;
+		var j: 5..20;
+		i:= j; (allowed, runtime check)
+
+Common List
+(declare (type (and integer( satisfies even p)) even_int))
+
+C subtypes 
+char *
+
+char* p = something
+char const *q = p; (This is fine)
+
+char const* q = something
+char *p = q; (Error!!!)
+*p = x; (Error!!!)
+
+char const* is a subtype of char*
+We can take a more specific value and assign it a variable of more general type.
+
+A type is more than just a set. The operations that can be defined depend on the type of the set. A value is a subtype of another if it has all the operations of its supertype and even more.
+
+int volatile *
+int *
+
+int* is a subtype of int volatile* since in addition to everything an int* can do, int volatile* always loads and stores directly into memory.
+
+type equivalence
+When are two types the same?
+
+Naive way: T is a subtype of U and U is a subtype of T
+
+typedef long ptrdiff_t;
+typedef long off_t; //Offset in a file
+
+ptrdiff_t x = something;
+off_t *p = &x;
+This uses structural equivalence, which is okay in C
+
+struct s {int val; struct s* next;};
+struct t {int val; struct t* next;};
+
+struct s s = something
+struct t t = s; 
+Name Equivalence, this won't be allowed since the names of the two types should be the same.
+
+Polymorphism:
+We want a function that accepts different types, we want + to work on int and float. This topic comes up first, more often with static type checking.
+
+Ad hoc polymorphism
+name mangling
+eg. 4 different add functinos will have a subscript added to it from 1-4
+C++, Java overloading looks at any types
+double d = add(i,j) // i,j are ints, problem if the sum overflows
+Ada overloading depends on the typ e of the result too.
+The Ada way is more complex
+
+float f;
+short c;
+add(i,f);
+
+Calculate the length of a list of any type. This is too hard for ad-hoc polymorphism.
+Parametric polymorphism
+This was first introduced in ML
+	a functions type can not only be polymorphic, but function type can contain type variables
+	(vary at compile-time not runtime)
+	Templating provided us a way to do that.
+
+Downside of type checking is that it is not statically checked until it is instantiated.
+
+The advantage of generics is that they can be compiled. 
+Advantage:
+	Only one copy of the code
+	statically checked once at the definition
+
+Subtypes + Generics
+	List<String> ls = something;
+	List<Object> lo = ls; //We should be able to do this assignment.
+	lo.add(new Thread());
+	String s  = ls.get() //returns the most recently added element to the list
+	// This will generate in error since the object we get is Thread, but we assign it to an object of type String
+
+	The 2nd statement is what causes the error. 
+	List<String> is not a subtype of List<Object>
+
+	To solve this problem, we can use the following code:
+
+	void printShape(List<? extends Shape> c) {
+		for (Object o: c) {
+			displayShape(o);
+		}
+	}
+	This is a bounded wildcard.
+	Suppose we wanted to convert from one collection to another.
+	void convert(List<?> src, List<?> dest) {
+		for(Object o: src) {
+			dest.add(o);
+		}
+	}
+	However this is not safe. We can do this, but it won't work on strings.
+	void convert(List<Object> src, List<Object> dest) {
+		for(Object o: src) {
+			dest.add(o);
+		}
+	}
+	We can do something like, (The T is similar to 'a in OCaml)
+	<T,U>
+	void convert(List<U extends T> src, List<T> dest) {
+		for(U o: src) {
+			dest.add(o);
+		}
+	}
+
+	We can take any java code and remove the ? from the templates. ? is to Java what _ is in OCaml

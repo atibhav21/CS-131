@@ -1,0 +1,12 @@
+The code assumes that all arguments passed in as
+listdiffs in the spec are proper listdiffs.
+Additionally, the code also assumes that every argument
+that is referred to as a listdiff in the spec returns
+#t when checked with the "pair?" predicate
+In the case of an error, as defined by the spec, 
+the code displays error to the standard output.
+The append-ld-helper procedure is there to avoid the
+variadic arguments that might be passed into the 
+append-ld procedure. 
+Other than these facts, I am not aware of any shortcomings
+in this code.

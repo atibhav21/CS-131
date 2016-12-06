@@ -1,0 +1,61 @@
+Description of Solution to the problem:
+I solved the problem using an and_matcher and an or_matcher. This approach 
+creates a structure similar to a parse tree so that if we encounter a 
+non-terminal, we can find options for it (or_matcher) or if its a terminal,
+we have to check the rest of the terms in the rule that we are considering. 
+The former part is done using an or_matcher and the latter part is done
+using an and_matcher. 
+
+And_matcher:
+If the rule is empty, then we have a successful derivation, so we call the 
+	acceptor
+Else If the fragment is empty, but the rule isn't, the rule isn't applicable
+	to the fragment so we return None
+Else get the first term of the rule, 
+	If terminal:
+		If it equals the beginning of the fragment, check the rest of the rule
+			using and_matcher
+		else return None
+	If Non-terminal: call the or_matcher with an updated acceptor function
+
+Or_matcher:
+If the fragment is empty, then call acceptor
+else if the currentRule list is empty (no acceptable rules), return None
+else
+	get the first rule, check if and_matcher matches this rule
+	if not, then check the next rule
+
+The purpose of the and_matcher is to match all the terms in a current rule, 
+it might call the or_matcher to expand on a non-terminal (and go down one 
+level in the parse tree). If it fails at any point, it returns None
+The purpose of the or_matcher is to iterate over the possible replacements 
+for a non-terminal. If it succeeds at any point, it returns otherwise it calls 
+itself with the next replacement.
+
+Approaches Tried But Failed:
+
+One of the approaches that I tried was that If we encounter a non-terminal, 
+find all the possible terminal values for this non-terminal, then iterate 
+through this list to match the fragment's current first term with options 
+in this list. However, this kind of approach didn't work because if a rule 
+for a symbol contains the exact same symbol, we might be stuck in an infinite 
+recursion. Also, this approach would be really slow on larger grammars and 
+generating a derivation list for the symbol would be a hard task. This 
+would also do a lot of unnecessary computation.
+
+Another approach that I tried was similar to the or_matcher and and_matcher 
+but it would pass an integer every time we encountered a non-terminal to 
+specify how many symbols we still had left to match, so that the length 
+of our derivation list isn't greater than the length of our fragment. 
+Also, with this approach if we encountered something like $0+1, we wouldn't
+match it with $(0+1) which would lead to an incorrect result.
+
+Drawbacks with the matcher:
+
+The matcher would fail if we don't have a left associative derivation. In this 
+case, an infinite recursion would occur. For instance, if we have a 
+replacement of LValue -> [[N Lvalue; N Num]], then the call to or_matcher 
+would find this rule, and then call the and_matcher with [N Lvalue; N Num]. 
+The and_matcher would then call the or_matcher again with the intention of 
+finding replacements for LValue. Hence, the matcher is back in the same place 
+as it was 2 steps ago. This would lead to an infinite recursion.
